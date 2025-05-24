@@ -6,11 +6,10 @@ from PIL import Image
 import os
 import sys
 
-# Ajouter le répertoire racine de brain_tumors_project au chemin de recherche
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 print("Project root added to sys.path:", project_root)
-print("sys.path:", sys.path)  # Pour déboguer
+print("sys.path:", sys.path)
 
 from models.cnn import CustomCNN
 from utils.prep import get_pytorch_transforms
@@ -24,7 +23,7 @@ pytorch_model.eval()
 
 tf_model = tf.keras.models.load_model(os.path.join(project_root, 'model_tf.h5'))
 
-class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']  # Adapter aux noms des dossiers dans dataset/
+class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']
 
 @app.route('/')
 def index():
@@ -47,20 +46,28 @@ def predict():
     except Exception as e:
         return jsonify({'error': f'Invalid image file: {str(e)}'}), 400
 
-    transform = get_pytorch_transforms()[1]  # Utilise test_transforms
+    transform = get_pytorch_transforms()[1]
     try:
         if model_type == 'pytorch':
             image_tensor = transform(image).unsqueeze(0)
             with torch.no_grad():
                 output = pytorch_model(image_tensor)
+                probabilities = torch.softmax(output, dim=1).squeeze().cpu().numpy()
                 prediction = torch.argmax(output, dim=1).item()
+                confidence = probabilities[prediction] * 100
         else:
             image_array = np.array(image.resize((224, 224))) / 255.0
             image_array = image_array[np.newaxis, ...]
             output = tf_model.predict(image_array)
+            probabilities = output[0]
             prediction = np.argmax(output, axis=1)[0]
-        
-        return jsonify({'prediction': class_names[prediction]})
+            confidence = probabilities[prediction] * 100
+
+        result = {
+            'prediction': class_names[prediction],
+            'confidence': f'{confidence:.2f}%'
+        }
+        return jsonify(result)
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 

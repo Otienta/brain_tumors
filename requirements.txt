@@ -1,4 +1,5 @@
 absl-py==2.2.2
+streamlit==1.36.0
 asttokens @ file:///opt/conda/conda-bld/asttokens_1646925590279/work
 astunparse==1.6.3
 backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
