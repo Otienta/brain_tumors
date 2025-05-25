@@ -16,7 +16,6 @@ class Trainer:
         self.epochs = epochs
         self.device = device
         
-        # Calculer les poids des classes
         labels = [label for _, label in train_loader.dataset]
         class_weights = compute_class_weight('balanced', classes=np.unique(labels), y=labels)
         class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
@@ -53,20 +52,16 @@ class Trainer:
             self.train_losses.append(epoch_loss)
             self.train_accuracies.append(epoch_accuracy)
 
-            # Évaluation sur le test set
             test_acc = self.evaluate_epoch()
             self.test_accuracies.append(test_acc)
 
-            # Ajuster le taux d'apprentissage
             self.scheduler.step(test_acc)
 
             print(f"Epoch {epoch+1}, Loss: {epoch_loss:.4f}, Train Accuracy: {epoch_accuracy:.2f}%, Test Accuracy: {test_acc:.2f}%")
 
-        # Sauvegarder le modèle
         torch.save(self.model.state_dict(), save_path)
         print(f"Modèle sauvegardé sous {save_path}")
 
-        # Créer et sauvegarder le graphique combiné
         epochs = range(1, self.epochs + 1)
         fig, ax1 = plt.subplots(figsize=(8, 5))
 
@@ -76,14 +71,14 @@ class Trainer:
         ax1.plot(epochs, self.train_losses, color=color_loss, label='Perte')
         ax1.tick_params(axis='y', labelcolor=color_loss)
 
-        ax2 = ax1.twinx()  # Instancier un second axe Y qui partage le même axe X
+        ax2 = ax1.twinx()
         color_acc = 'tab:red'
         ax2.set_ylabel('Accuracy (%)', color=color_acc)
         ax2.plot(epochs, self.train_accuracies, color=color_acc, label='Accuracy')
         ax2.tick_params(axis='y', labelcolor=color_acc)
 
         plt.title('Training Loss and Accuracy (PyTorch)')
-        fig.tight_layout()  # Pour éviter les chevauchements
+        fig.tight_layout() 
         plt.savefig('training_history_pytorch.png')
         plt.close()
 
