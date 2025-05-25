@@ -13,8 +13,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train or evaluate brain tumor CNN models")
     parser.add_argument('--mode', choices=['train', 'eval'], default='train')
     parser.add_argument('--epochs', type=int, default=15)
-    parser.add_argument('--lr', type=float, default=0.0005)  # Réduit pour un apprentissage plus fin
-    parser.add_argument('--wd', type=float, default=1e-3)   # Augmenté pour plus de régularisation
+    parser.add_argument('--lr', type=float, default=0.0005)
+    parser.add_argument('--wd', type=float, default=1e-3)
     parser.add_argument('--cuda', action='store_true')
     return parser.parse_args()
 
@@ -32,12 +32,10 @@ def train_tensorflow_model(args):
     train_generator, test_generator, class_indices = get_tensorflow_generators(data_dir='dataset')
     model = create_cnn_model(num_classes=len(class_indices))
     
-    # Calculer les poids des classes
     labels = train_generator.classes
     class_weights = compute_class_weight('balanced', classes=np.unique(labels), y=labels)
     class_weights_dict = dict(enumerate(class_weights))
     
-    # Ajouter un planificateur de taux d'apprentissage
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_accuracy', factor=0.5, patience=2, verbose=1)
     
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -54,7 +52,6 @@ def train_tensorflow_model(args):
     model.save('model_tf.h5')
     print("TensorFlow model saved at model_tf.h5")
 
-    # Créer et sauvegarder le graphique combiné pour TensorFlow
     epochs = range(1, args.epochs + 1)
     fig, ax1 = plt.subplots(figsize=(8, 5))
 
@@ -64,14 +61,14 @@ def train_tensorflow_model(args):
     ax1.plot(epochs, history.history['loss'], color=color_loss, label='Perte')
     ax1.tick_params(axis='y', labelcolor=color_loss)
 
-    ax2 = ax1.twinx()  # Instancier un second axe Y qui partage le même axe X
+    ax2 = ax1.twinx()  
     color_acc = 'tab:red'
     ax2.set_ylabel('Accuracy (%)', color=color_acc)
     ax2.plot(epochs, [acc * 100 for acc in history.history['accuracy']], color=color_acc, label='Accuracy')
     ax2.tick_params(axis='y', labelcolor=color_acc)
 
     plt.title('Training Loss and Accuracy (TensorFlow)')
-    fig.tight_layout()  # Pour éviter les chevauchements
+    fig.tight_layout() 
     plt.savefig('training_history_tf.png')
     plt.close()
 
@@ -81,7 +78,7 @@ def main():
     print(f"Using device: {device}")
 
     if args.mode == 'train':
-        #train_pytorch_model(args, device)
+        train_pytorch_model(args, device)
         train_tensorflow_model(args)
     elif args.mode == 'eval':
         train_loader, test_loader, classes = get_pytorch_dataloaders(data_dir='dataset')
