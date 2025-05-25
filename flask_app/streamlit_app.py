@@ -6,7 +6,7 @@ from PIL import Image
 import os
 import sys
 
-# Add the root directory to the search path
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
@@ -14,7 +14,6 @@ from models.cnn import CustomCNN
 from utils.prep import get_pytorch_transforms
 from models.cnn_tf import create_cnn_model
 
-# Load the models
 pytorch_model = CustomCNN(num_classes=4)
 pytorch_model.load_state_dict(torch.load(os.path.join(project_root, 'model.pth'), map_location='cpu'))
 pytorch_model.eval()
@@ -23,131 +22,8 @@ tf_model = tf.keras.models.load_model(os.path.join(project_root, 'model_tf.h5'))
 
 class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']
 
-# CSS personnalisé pour le style médical
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #f5f5f5;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: 100vh;
-        color: #333333;
-    }
-
-    /* En-tête */
-    .header {
-        background-color: #ffffff;
-        width: 100%;
-        padding: 15px 0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
-
-    .header h1 {
-        color: #003087; /* Bleu foncé médical */
-        font-size: 28px;
-        font-weight: 700;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    /* Section principale */
-    .custom-container {
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        max-width: 600px;
-        width: 90%;
-        text-align: center;
-        margin: 20px auto;
-        border: 3px solid #1e90ff; /* Bordure bleue */
-    }
-
-    .welcome-message {
-        color: #003087; /* Bleu foncé médical */
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 20px;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    /* Style pour le titre */
-    h2 {
-        color: #003087;
-        font-size: 22px;
-        font-weight: 400;
-        margin-bottom: 20px;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    /* Style pour les boutons */
-    .stButton>button {
-        background-color: #1e90ff; /* Bleu hospitalier */
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 12px;
-        font-weight: 700;
-        font-family: 'Roboto', sans-serif;
-        transition: all 0.3s ease;
-    }
-
-    .stButton>button:hover {
-        background-color: #1c86ee;
-        box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
-    }
-
-    /* Style pour le selectbox */
-    .stSelectbox select {
-        background-color: #f9f9f9;
-        border-radius: 5px;
-        padding: 12px;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    /* Style pour l'image */
-    .stImage img {
-        max-width: 300px;
-        max-height: 300px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .stImage img:hover {
-        transform: scale(1.05);
-    }
-
-    /* Style pour les messages de succès et d'erreur */
-    .stSuccess {
-        color: #333333;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    .stError {
-        color: #e74c3c;
-        font-family: 'Roboto', sans-serif;
-    }
-
-    /* Pied de page */
-    .footer {
-        background-color: #1e90ff;
-        width: 100%;
-        text-align: center;
-        padding: 15px 0;
-        color: #ffffff;
-        font-size: 14px;
-        font-weight: 400;
-        font-family: 'Roboto', sans-serif;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# En-tête
 st.markdown('<div class="header"><h1>Brain Tumor Diagnostics</h1></div>', unsafe_allow_html=True)
 
-# Section principale
 with st.container():
     st.markdown('<div class="custom-container">', unsafe_allow_html=True)
     
@@ -184,7 +60,6 @@ with st.container():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Pied de page
 st.markdown('<div class="footer">Developed by Ousmane TIENTA</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
